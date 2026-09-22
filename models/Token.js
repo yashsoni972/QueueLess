@@ -6,6 +6,9 @@ const TokenSchema = new mongoose.Schema({
     serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
     status: { type: String, enum: ['waiting', 'serving', 'completed', 'cancelled'], default: 'waiting' },
     position: { type: Number },
+    servedAt: { type: Date, default: null },
+    completedAt: { type: Date, default: null },
+    serviceDurationMinutes: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -2,27 +2,40 @@ const express = require('express');
 const router = express.Router();
 const Service = require('../models/Service');
 
-// Get all active services
+// Get default active service ("Smart Service Center")
 router.get('/', async (req, res) => {
     try {
-        const services = await Service.find({ status: 'active' });
+        let services = await Service.find({ status: 'active' });
+
+        // If no active service exists, create default Smart Service Center
+        if (services.length === 0) {
+            const defaultCenter = new Service({
+                name: 'Smart Service Center',
+                description: 'Main Customer Service Counter',
+                estimatedTime: 5,
+                averageServiceTime: 5
+            });
+            await defaultCenter.save();
+            services = [defaultCenter];
+        }
         res.json(services);
     } catch (err) {
         res.status(500).send('Server Error');
     }
 });
 
-// Seed demo services (Run this once)
+// Seed demo Smart Service Center
 router.post('/seed', async (req, res) => {
     try {
-        const demoServices = [
-            { name: 'General Consultation', description: 'General health checkup', estimatedTime: 10 },
-            { name: 'Dental Checkup', description: 'Basic dental cleaning and checkup', estimatedTime: 15 },
-            { name: 'Salon - Haircut', description: 'Professional haircut service', estimatedTime: 20 },
-            { name: 'Laptop Repair', description: 'Hardware diagnostics and repair', estimatedTime: 30 }
-        ];
-        await Service.insertMany(demoServices);
-        res.json({ msg: 'Demo services added successfully' });
+        await Service.deleteMany({});
+        const demoService = new Service({
+            name: 'Smart Service Center',
+            description: 'Main Customer Support & Processing Counter',
+            estimatedTime: 5,
+            averageServiceTime: 5
+        });
+        await demoService.save();
+        res.json({ msg: 'Smart Service Center initialized successfully', service: demoService });
     } catch (err) {
         res.status(500).send('Server Error');
     }
